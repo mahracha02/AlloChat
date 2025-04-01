@@ -1,23 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
 import AlloChat from "../../assets/photos/AlloChat.png";
 
 const Register = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess("Inscription réussie! Veuillez vous connecter.");
+      } else {
+        setError(data.error || "Erreur lors de l'inscription");
+      }
+    } catch (error) {
+      setError("Problème de connexion avec le serveur");
+    }
+  };
+
   return (
     <div className="flex items-center justify-center h-screen bg-blue-200 ">
       <div className="bg-white p-8 rounded-lg shadow-lg w-1/4">
-        {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src={AlloChat} alt="AlloChat Logo" className="w-50 h-50" />
         </div>
-
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">
           Créer un compte AlloChat
         </h2>
-        <form className="space-y-4">
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        {success && <p className="text-green-500 text-center">{success}</p>}
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-gray-700">Nom d'utilisateur</label>
             <input
               type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
               placeholder="Entrez votre nom"
               className="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
@@ -26,6 +66,9 @@ const Register = () => {
             <label className="block text-gray-700">Email</label>
             <input
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="Entrez votre email"
               className="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
@@ -34,6 +77,9 @@ const Register = () => {
             <label className="block text-gray-700">Mot de passe</label>
             <input
               type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="Choisissez un mot de passe"
               className="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
@@ -57,4 +103,3 @@ const Register = () => {
 };
 
 export default Register;
-
