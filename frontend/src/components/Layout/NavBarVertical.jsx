@@ -1,6 +1,7 @@
-import React from 'react';
-import { Bell, MessageCircle, Users } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { Settings, Moon, Sun, Bell, HelpCircle, Users, LogOut, MessageCircle } from "lucide-react";
 import AlloChatLogo from '../../assets/photos/AlloChat.png';
+import SideBar from '../Layout/sideBar';
 
 const NavItem = ({ icon: Icon, label, id, activeTab, setActiveTab }) => (
   <div
@@ -25,7 +26,22 @@ const NavItem = ({ icon: Icon, label, id, activeTab, setActiveTab }) => (
 );
 
 const NavbarVertical = ({ darkMode, activeTab, setActiveTab }) => {
-
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsSettingsOpen(false);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   
 
   return (
@@ -66,13 +82,24 @@ const NavbarVertical = ({ darkMode, activeTab, setActiveTab }) => {
         </div>
         
         {/* User Profile Bottom */}
-        <div className="pb-4 flex justify-center">
-          <div 
-            className={`w-10 h-10 ${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-600`}
-            onClick={() => alert('User Profile')}
+        <div className="px-4 pb-4 border-t border-gray-200 relative" ref={dropdownRef}>
+        <div className="pb-4 pt-4 flex justify-center">
+          <div
+            className={`w-10 h-10 ${darkMode ? 'bg-indigo-700' : 'bg-indigo-600'} text-white rounded-full flex items-center justify-center cursor-pointer hover:bg-indigo-800 transition-colors`}
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
           >
-            <span className="font-bold">JD</span>
+            <Settings size={18} />
           </div>
+        </div>
+        
+        {/* Settings dropdown menu */}
+        {isSettingsOpen && (
+          <div className={`absolute bottom-20 left-0 w-56 ml-4 rounded-lg shadow-lg overflow-hidden ${
+            darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+          }`}>
+            <SideBar darkMode={darkMode} />
+          </div>
+        )}
         </div>
       </div>
     </div>
